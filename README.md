@@ -1,5 +1,5 @@
 # flatwhite
-Python-C Module for Edit Distance Algorithms
+Python3-C Module for Edit Distance Algorithms
 
 ## Installation
 ```
