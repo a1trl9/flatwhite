@@ -1,6 +1,5 @@
 #include "ed.h"
 #include <stdlib.h>
-#include <stdio.h>
 #include <Python.h>
 
 int local_edit_distance(const Py_UNICODE* s, size_t ss, const Py_UNICODE* t, size_t st,
