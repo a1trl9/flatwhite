@@ -10,19 +10,20 @@ static PyObject* ged(PyObject* self, PyObject* args) {
     int st;
     int match = 0;
     int mismatch = 1;
-    int gap = 1;
+    int insert = 1;
+    int delete = 1;
     int result = 0;
 
-    if (!PyArg_ParseTuple(args, "u#u#|iii", &s, &ss, &t, &st, &match, &mismatch, &gap)) {
+    if (!PyArg_ParseTuple(args, "u#u#|iiii", &s, &ss, &t, &st, &match, &mismatch, &insert, &delete)) {
         PyErr_SetString(PyExc_TypeError, "Invalid Arguments");
         return NULL;
     }
 
-    if ((match <= mismatch && match >= gap) || (match <= gap && match >= mismatch)) {
+    if ((match <= mismatch && (match >= insert || match >= delete)) || ((match <= insert || match <= delete) && match >= mismatch)) {
         PyErr_SetString(ParamError, "Match should be smallest or largest...");
         return NULL;
     }
-    result = global_edit_distance(s, ss, t, st, match, mismatch, gap);
+    result = global_edit_distance(s, ss, t, st, match, mismatch, insert, delete);
     return Py_BuildValue("i", result);
 }
 
@@ -33,29 +34,30 @@ static PyObject* led(PyObject* self, PyObject* args) {
     int st;
     int match = 1;
     int mismatch = -1;
-    int gap = -1;
+    int insert = -1;
+    int delete = -1;
     int result = 0;
 
-    if (!PyArg_ParseTuple(args, "u#u#|iii", &s, &ss, &t, &st, &match, &mismatch, &gap)) {
+    if (!PyArg_ParseTuple(args, "u#u#|iiii", &s, &ss, &t, &st, &match, &mismatch, &insert, &delete)) {
         PyErr_SetString(PyExc_TypeError, "Invalid Arguments");
         return NULL;
     }
 
-    if ((match <= mismatch && match >= gap) || (match <= gap && match >= mismatch)) {
+    if ((match <= mismatch && (match >= insert || match >= delete)) || ((match <= insert || match <= delete) && match >= mismatch)) {
         PyErr_SetString(ParamError, "Match should be smallest or largest...");
         return NULL;
     }
-    if (match == 0 || gap == 0 || mismatch == 0) {
+    if (match == 0 || insert == 0 || delete == 0 || mismatch == 0) {
         PyErr_SetString(ParamError, "Pls do not use 0 as parameters since we use it as the pivot");
         return NULL;
     }
-    result = local_edit_distance(s, ss, t, st, match, mismatch, gap);
+    result = local_edit_distance(s, ss, t, st, match, mismatch, insert, delete);
     return Py_BuildValue("i", result);
 }
 
 static PyMethodDef methods[] = {
-    {"ged", ged, METH_VARARGS, "ged(source, target, match, mismatch, gap)\n"},
-    {"led", led, METH_VARARGS, "led(source, target, match, mismatch, gap)\n"},
+    {"ged", ged, METH_VARARGS, "ged(source, target, match, mismatch, insert, delete)\n"},
+    {"led", led, METH_VARARGS, "led(source, target, match, mismatch, insert, delete)\n"},
     {NULL, NULL, 0, NULL}
 };
 

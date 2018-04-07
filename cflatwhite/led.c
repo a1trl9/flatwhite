@@ -3,7 +3,7 @@
 #include <Python.h>
 
 int local_edit_distance(const Py_UNICODE* s, size_t ss, const Py_UNICODE* t, size_t st,
-    int match, int mismatch, int gap
+    int match, int mismatch, int insert, int delete
 ) {
     size_t rows = st + 1;
     size_t cols = ss + 1;
@@ -13,19 +13,19 @@ int local_edit_distance(const Py_UNICODE* s, size_t ss, const Py_UNICODE* t, siz
     int *dp = malloc(rows * cols * sizeof(int));
 
     for (size_t i = 0; i < rows; i++) {
-        dp[i * cols] = i * gap;
+        dp[i * cols] = 0;
     }
 
     for (size_t i = 0; i < cols; i++) {
-        dp[i] = i * gap;
+        dp[i] = i * 0;
     }
 
     for (size_t j = 1; j < rows; j++) {
         for (size_t k = 1; k < cols; k++) {
             d3 = s[k - 1] == t[j - 1] ? dp[(j - 1) * cols + k - 1] + match :
                 dp[(j - 1) * cols + k - 1] + mismatch;
-            d1 = dp[j * cols + k - 1] + gap;
-            d2 = dp[(j - 1) * cols + k] + gap;
+            d1 = dp[j * cols + k - 1] + delete;
+            d2 = dp[(j - 1) * cols + k] + insert;
             if (is_distance) {
                 dp[j * cols + k] = MIN(0, MIN(d3, MIN(d1, d2)));
             } else {
