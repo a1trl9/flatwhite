@@ -7,9 +7,8 @@
 #include "ngram.h"
 
 #ifndef KEY_MAX_LENGTH
-#define KEY_MAX_LENGTH (16)
+#define KEY_MAX_LENGTH (10)
 #endif
-
 
 typedef struct gram {
     char key[KEY_MAX_LENGTH]; 
@@ -21,7 +20,7 @@ void build_map(map_t result, const char* target, size_t length, unsigned index) 
     char sub[index + 1];
     for (size_t i = 0; i <= length - index; i++) {
         gram* value;
-        memcpy(sub, target + i, index);
+        strncpy(sub, target + i, index);
         sub[index] = '\0';
         error = hashmap_get(result, sub, (void**)(&value));
         if (error == MAP_OK) {
@@ -40,7 +39,7 @@ void remove_map(map_t result, const char* target, size_t length, unsigned index)
     char sub[index + 1];
     for (size_t i = 0; i <= length - index; i++) {
         gram* value;
-        memcpy(sub, target + i, index);
+        strncpy(sub, target + i, index);
         sub[index] = '\0';
         error = hashmap_get(result, sub, (void**)(&value));
         if (error == MAP_OK) {
@@ -91,21 +90,20 @@ void build_map_collection(map_t* collections, const char** words, size_t length,
 //     }
 // }
 
-int calc_ngram_distance(const char* s1, size_t l1, const char* s2, size_t l2, unsigned index) {
+int inner_calc_ngram_distance(map_t map, const char* s1, size_t l1, const char* s2, size_t l2, unsigned index) {
     int common = 0;
-    if (l1 + 1 <  index || l2 + 1 < index) {
+    if (l1 <  index || l2 < index) {
         int d1 = l1 + 1 - index;
         int d2 = l2 + 1 - index;
         return MAX(0, d1) + MAX(0, d2);
     }
     if (l1 >= index && l2 >= index) {
-        map_t map = hashmap_new();
         char sub[index + 1];
         gram* value;
         int error;
         build_map(map, &s1[0], l1, index);
         for (size_t i = 0; i <= l2 - index; i++) {
-            memcpy(sub, s2 + i, index);
+            strncpy(sub, s2 + i, index);
             sub[index] = '\0';
             error = hashmap_get(map, sub, (void**)(&value));
             if (error == MAP_OK && value->count) {
@@ -115,25 +113,25 @@ int calc_ngram_distance(const char* s1, size_t l1, const char* s2, size_t l2, un
         }
         remove_map(map, &s1[0], l1, index);
     }
-    common += 2;
-    for (size_t i = 0; i < index - 1; i++) {
-        if (*(s1 + i) != *(s2 + i)) {
-            common -= 1;
-            break;
-        }
-    }
-    for (size_t i = 0; i < index - 1; i++) {
-        if (*(s1 + l1 - 1 - i) != *(s2 + l2 - 1 - i)) {
-            common -= 1;
-            break;
-        }
-    }
     return 6 + l1 + l2 - 2 * index - 2 * common;
 }
 
+int calc_ngram_distance(const char* s1, size_t l1, const char* s2, size_t l2, unsigned index) {
+    map_t map = hashmap_new();
+    char ns1[l1 + 2];
+    char ns2[l2 + 2];
+    ns1[0] = '#';
+    ns2[0] = '#';
+    strncpy(&ns1[1], s1, l1);
+    strncpy(&ns2[1], s2, l2);
+    ns1[l1 + 1] = '#';
+    ns2[l2 + 1] = '#';
+    return inner_calc_ngram_distance(map, &ns1[0], l1 + 2, &ns2[0], l2 + 2, index);
+}
+
 // int main() {
-//     map_t collection[5];
-//     const char* cands[3] = {"abc", "aes", "aws"}; 
-//     build_map_collection(collection, &cands[0], 3, 2);
+//     char l1[5] = "abasd";
+//     char l2[6] = "absdd";
+//     calc_ngram_distance(&l1[0], 5, &l2[0], 6, 2);
 //     return 0;
 // }
