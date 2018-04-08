@@ -1,6 +1,7 @@
-#include "ed.h"
 #include <stdlib.h>
 #include <Python.h>
+#include "ed.h"
+#include "dr.h"
 
 int global_edit_distance(const Py_UNICODE* s, size_t ss, const Py_UNICODE* t, size_t st,
     int match, int mismatch, int insert, int delete

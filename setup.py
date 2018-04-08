@@ -45,6 +45,14 @@ setup(
         'testing': ['pytest']
         },
     ext_modules=[
-        Extension('flatwhite.cflatwhite', ['cflatwhite/gedmodule.c', 'cflatwhite/ged.c', 'cflatwhite/led.c'])
+        Extension('flatwhite.cflatwhite',
+            ['cflatwhite/dr.c',
+             'cflatwhite/ged.c',
+             'cflatwhite/led.c',
+             'cflatwhite/tf_idf.c',
+             'cflatwhite/ngram.c',
+             'cflatwhite/hashmap.c',
+            ]
+        )
     ]
     )
