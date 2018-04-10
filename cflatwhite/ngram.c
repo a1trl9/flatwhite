@@ -1,4 +1,4 @@
-// #include <limits.h>
+// #include <stdio.h>
 #include <stddef.h>
 #include <string.h>
 #include "dr.h"
@@ -26,7 +26,7 @@ void build_map(map_t result, const char* target, size_t length, unsigned index) 
             value->count += 1;
         } else {
             value = (gram*) malloc(sizeof(gram));
-            memcpy(value->key, sub, index + 1);
+            strncpy(value->key, sub, index + 1);
             value->count = 1;
             hashmap_put(result, value->key, value);
         }
@@ -70,7 +70,7 @@ void build_map_collection(map_t* collections, const char** words, size_t length,
 //         size_t l2 = strlen(ch);
 //         if (l2 > index && l > index) {
 //             for (size_t j = 0; j <= l2 - index; j++) {
-//                 memcpy(sub, ch + j, index);
+//                 strncpy(sub, ch + j, index);
 //                 sub[index] = '\0';
 //                 error = hashmap_get(map, sub, (void**)(&value));
 //                 if (error == MAP_OK && value->count) {
@@ -112,7 +112,7 @@ int inner_calc_ngram_distance(map_t map, const char* s1, size_t l1, const char* 
         }
         remove_map(map, &s1[0], l1, index);
     }
-    return 6 + l1 + l2 - 2 * index - 2 * common;
+    return l1 + l2 - 2 - 2 * common;
 }
 
 int calc_ngram_distance(const char* s1, size_t l1, const char* s2, size_t l2, unsigned index) {
