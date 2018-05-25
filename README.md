@@ -1,5 +1,5 @@
 # flatwhite
-Python3-C binding Module for Document Retrieval..
+Python3-C binding Module for Document Retrieval(maybe)..
 
 ## Installation
 ```
