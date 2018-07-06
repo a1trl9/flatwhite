@@ -1,5 +1,5 @@
 # flatwhite
-Python3-C binding Module for Document Retrieval(maybe)..
+Python3 Module for string distance algorithms. Implemented in C.
 
 ## Installation
 ```
